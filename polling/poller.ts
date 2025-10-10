@@ -6,7 +6,7 @@ import { sendSaleMessage } from "../tg-bot/utils";
 
 const NFT_INDEXED_DATA_PATH = 'indexed-data/nfts.json';
 
-const startTime = Date.now();
+let lastProcessedTimestamp = Date.now();
 
 export async function pollForBuyEvents() {
     console.log('✅ Polling for buy events..');
@@ -20,7 +20,7 @@ export async function pollForBuyEvents() {
         limit: 20
     });
 
-    const newBuyEvents = buyEvents.filter((event) => (Number(event.timestampMs) > startTime)).filter((event) => nfts.some((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id));
+    const newBuyEvents = buyEvents.filter((event) => (Number(event.timestampMs) > lastProcessedTimestamp)).filter((event) => nfts.some((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id));
 
     if (newBuyEvents.length > 0) {
         console.log(`✅ Found ${newBuyEvents.length} new buy events`);
@@ -52,4 +52,6 @@ export async function pollForBuyEvents() {
             }
         }
     }
+
+    lastProcessedTimestamp = Date.now();
 }
