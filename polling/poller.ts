@@ -60,5 +60,4 @@ export async function pollForBuyEvents() {
             }
         }
     }, 3000) // 3 seconds
-
 }
