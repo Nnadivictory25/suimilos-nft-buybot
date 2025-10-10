@@ -1,0 +1,22 @@
+{
+  "name": "suimilos-nft-buybot",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun run --watch index.ts",
+    "get-nfts": "bun run scripts/get-nfts.ts",
+    "get-rarity-scores": "bun run scripts/get-rarity-scores.ts",
+    "get-stats": "bun run scripts/get-stats.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.39.1",
+    "grammy": "^1.38.3"
+  }
+}
