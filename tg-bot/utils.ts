@@ -35,6 +35,7 @@ ${formatUrl({ url: `${SUI_SCAN_URL(buyer)}`, text: 'Buyer' })}`
     await bot.api.sendPhoto(GROUP_ID, imageUrl, {
         caption: msg,
         reply_markup: keyboard,
+        parse_mode: 'HTML',
     });
 
 }
