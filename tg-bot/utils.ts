@@ -1,7 +1,11 @@
 import { InlineKeyboard } from "grammy"
-import { TRADE_PORT_URL, MY_USERNAME, SUI_SCAN_URL, GROUP_ID } from "../constants"
+import { TRADE_PORT_URL, MY_USERNAME, SUI_SCAN_URL, SUIMILOS_GROUP_ID, MY_GROUP_ID } from "../constants"
 import { getSuiPrice } from "../utils"
 import { bot } from "."
+
+const isDev = process.env.NODE_ENV === 'development';
+const GROUP_ID = isDev ? MY_GROUP_ID : SUIMILOS_GROUP_ID;
+console.log(`🔍 Using group ID: ${GROUP_ID} on ${isDev ? 'development' : 'production'}`);
 
 function formatUrl({ url, text }: { url: string, text: string }) {
     return `<b><a href="${url}">${text}</a></b>`
@@ -13,7 +17,6 @@ const formatAmount = (amount: number) => {
         maximumFractionDigits: 2,
     });
 }
-
 
 const keyboard = new InlineKeyboard()
     .url('🛒 TradePort', TRADE_PORT_URL)

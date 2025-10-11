@@ -9,5 +9,6 @@ export const SUI_SCAN_URL = (account: string) => `https://suiscan.xyz/mainnet/ac
 export const TRADE_PORT_URL = `https://www.tradeport.xyz/sui/collection/${encodeURIComponent(NFT_TYPE)}?bottomTab=trades&tab=items`
 export const NFT_IMAGE_BASE_URL = 'https://walrus.doonies.net/suimilios'
 
-export const GROUP_ID = '-4564790096';
+export const MY_GROUP_ID = '-4564790096';
+export const SUIMILOS_GROUP_ID = '-1003048692092';
 export const MY_USERNAME = 'victory_web3'
