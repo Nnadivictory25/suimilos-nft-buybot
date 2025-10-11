@@ -7,6 +7,7 @@ import { sendSaleMessage } from "../tg-bot/utils";
 const NFT_INDEXED_DATA_PATH = 'indexed-data/nfts.json';
 
 let lastProcessedTimestamp = Date.now();
+const processedEventIds = new Set<string>();
 
 export async function pollForBuyEvents() {
     console.log('✅ Polling for buy events..');
@@ -23,14 +24,14 @@ export async function pollForBuyEvents() {
                 limit: 50
             });
 
-            const newBuyEvents = buyEvents.filter((event) => (Number(event.timestampMs) > lastProcessedTimestamp)).filter((event) => nfts.some((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id));
+            // Filter for new events (by timestamp) and our NFT collection, exclude already processed
+            const newBuyEvents = buyEvents
+                .filter((event) => Number(event.timestampMs) > lastProcessedTimestamp)
+                .filter((event) => !processedEventIds.has(`${event.id.txDigest}-${event.id.eventSeq}`))
+                .filter((event) => nfts.some((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id));
 
             if (newBuyEvents.length > 0) {
                 console.log(`✅ Found ${newBuyEvents.length} new buy events`);
-
-                // Update timestamp to most recent event
-                const mostRecentEventTimestamp = Math.max(...newBuyEvents.map(event => Number(event.timestampMs)));
-                lastProcessedTimestamp = mostRecentEventTimestamp;
 
                 for (const event of newBuyEvents) {
                     const nft = nfts.find((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id);
@@ -41,7 +42,6 @@ export async function pollForBuyEvents() {
                         const salesEventInfo = (event.parsedJson as TradePortBuyEvent)
                         const suiAmount = (Number(salesEventInfo.price) + Number(salesEventInfo.commission)) / Number(MIST_PER_SUI)
                         const rarity = await getRarityScore(nft.id)
-
 
                         try {
                             const salesMessageParams: SalesMessageParams = {
@@ -54,12 +54,20 @@ export async function pollForBuyEvents() {
 
                             await sendSaleMessage(salesMessageParams);
                             console.log(`✅ Sent sale message for ${nft.name}`);
+
+                            // Mark as processed
+                            processedEventIds.add(`${event.id.txDigest}-${event.id.eventSeq}`);
                         } catch (error) {
-                            console.error(`Error sending sale message for ${nft.name}:`, error);
+                            console.error(`❌ Error sending sale message for ${nft.name}:`, error);
                         }
                     }
                 }
+
+                // Update timestamp to most recent successfully processed event
+                const mostRecentTimestamp = Math.max(...newBuyEvents.map(event => Number(event.timestampMs)));
+                lastProcessedTimestamp = mostRecentTimestamp;
             }
+
         } catch (error) {
             console.error('❌ Error polling for buy events:', error);
         }

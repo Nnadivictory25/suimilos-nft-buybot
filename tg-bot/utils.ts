@@ -1,4 +1,4 @@
-import { InlineKeyboard } from "grammy"
+import { InlineKeyboard, InputFile } from "grammy"
 import { TRADE_PORT_URL, MY_USERNAME, SUI_SCAN_URL, SUIMILOS_GROUP_ID, MY_GROUP_ID } from "../constants"
 import { getSuiPrice } from "../utils"
 import { bot } from "."
@@ -35,10 +35,18 @@ Sold for <b>${formatAmount(amount)} SUI</b> (${formatAmount(usdAmount)} USD)
 
 ${formatUrl({ url: `${SUI_SCAN_URL(buyer)}`, text: 'Buyer' })}`
 
-    await bot.api.sendPhoto(GROUP_ID, imageUrl, {
-        caption: msg,
-        reply_markup: keyboard,
-        parse_mode: 'HTML',
-    });
-
+    try {
+        await bot.api.sendPhoto(GROUP_ID, new InputFile(imageUrl), {
+            caption: msg,
+            reply_markup: keyboard,
+            parse_mode: 'HTML',
+        });
+    } catch (error) {
+        // If image fails, send as text message only
+        console.log(`⚠️ Failed to send with image, sending text only for ${name}`);
+        await bot.api.sendMessage(GROUP_ID, msg, {
+            reply_markup: keyboard,
+            parse_mode: 'HTML',
+        });
+    }
 }
