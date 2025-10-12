@@ -25,11 +25,12 @@ const keyboard = new InlineKeyboard()
 export async function sendSaleMessage({ name, amount, rarity, buyer, imageUrl }: SalesMessageParams) {
     const suiPrice = await getSuiPrice();
     const usdAmount = suiPrice * amount;
+    const isHighRarity = rarity <= 200;
 
     const msg = `
 🤪 <b>${name}</b> just found a new home 🥹
 
-🏅 Rank: <b>${rarity}</b>
+🏅 Rank: <b>${rarity}</b> ${isHighRarity ? '🔥 😱' : ''}
 
 Sold for <b>${formatAmount(amount)} SUI</b> (${formatAmount(usdAmount)} USD)
 
