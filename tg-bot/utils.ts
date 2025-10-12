@@ -36,14 +36,14 @@ Sold for <b>${formatAmount(amount)} SUI</b> (${formatAmount(usdAmount)} USD)
 ${formatUrl({ url: `${SUI_SCAN_URL(buyer)}`, text: 'Buyer' })}`
 
     try {
-        await bot.api.sendPhoto(GROUP_ID, new InputFile(imageUrl), {
+        await bot.api.sendPhoto(GROUP_ID, new InputFile({ url: imageUrl }), {
             caption: msg,
             reply_markup: keyboard,
             parse_mode: 'HTML',
         });
     } catch (error) {
         // If image fails, send as text message only
-        console.log(`⚠️ Failed to send with image, sending text only for ${name}`);
+        console.log(`⚠️ Failed to send with image, sending text only for ${name}`, error);
         await bot.api.sendMessage(GROUP_ID, msg, {
             reply_markup: keyboard,
             parse_mode: 'HTML',
