@@ -5,7 +5,7 @@ import { pollForBuyEvents } from "./polling/poller";
 const PORT = process.env.PORT || 4444;
 
 export const suiClient = new SuiClient({
-    url: getFullnodeUrl("mainnet"),
+    url: "https://rpc-mainnet.suiscan.xyz",
 });
 
 // Only run the server and polling when this file is executed directly
