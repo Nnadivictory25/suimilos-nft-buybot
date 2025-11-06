@@ -53,7 +53,7 @@ export async function pollForBuyEvents() {
                         console.log(`✅ Sale event found and processing for ${nft.name}...`);
 
                         const salesEventInfo = (event.parsedJson as TradePortBuyEvent)
-                        const suiAmount = (Number(salesEventInfo.price) + Number(salesEventInfo.commission)) / Number(MIST_PER_SUI)
+                        const suiAmount = (Number(salesEventInfo.price) + (salesEventInfo.commission ? Number(salesEventInfo.commission) : 0)) / Number(MIST_PER_SUI)
                         const rarity = await getRarityScore(nft.id)
 
                         try {

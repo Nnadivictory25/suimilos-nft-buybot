@@ -26,7 +26,7 @@ type TradePortBuyEvent = {
     beneficiary: string
     buyer: string
     buyer_kiosk_id: string
-    commission: string
+    commission?: string
     listing_id: string
     nft_id: string
     price: string
