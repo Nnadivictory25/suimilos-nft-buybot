@@ -1,6 +1,6 @@
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { suiClient } from "..";
-import { NFT_IMAGE_BASE_URL, TRADE_PORT_BUY_EVENT_TYPE } from "../constants";
+import { NFT_IMAGE_BASE_URL, TRADE_PORT_BUY_EVENT_TYPE, NEW_TRADE_PORT_BUY_EVENT_TYPE } from "../constants";
 import { getNftNumber, getRarityScore } from "../utils";
 import { sendSaleMessage } from "../tg-bot/utils";
 
@@ -16,16 +16,29 @@ export async function pollForBuyEvents() {
 
     async function poll() {
         try {
-            const { data: buyEvents } = await suiClient.queryEvents({
-                query: {
-                    MoveEventType: TRADE_PORT_BUY_EVENT_TYPE,
-                },
-                order: 'descending',
-                limit: 50
-            });
+            // Query both event types concurrently
+            const [oldBuyEventsResult, newBuyEventsResult] = await Promise.all([
+                suiClient.queryEvents({
+                    query: {
+                        MoveEventType: TRADE_PORT_BUY_EVENT_TYPE,
+                    },
+                    order: 'descending',
+                    limit: 50
+                }),
+                suiClient.queryEvents({
+                    query: {
+                        MoveEventType: NEW_TRADE_PORT_BUY_EVENT_TYPE,
+                    },
+                    order: 'descending',
+                    limit: 50
+                })
+            ]);
+
+            // Combine events from both queries
+            const allBuyEvents = [...oldBuyEventsResult.data, ...newBuyEventsResult.data];
 
             // Filter for new events (by timestamp) and our NFT collection, exclude already processed
-            const newBuyEvents = buyEvents
+            const newBuyEvents = allBuyEvents
                 .filter((event) => Number(event.timestampMs) > lastProcessedTimestamp)
                 .filter((event) => !processedEventIds.has(`${event.id.txDigest}-${event.id.eventSeq}`))
                 .filter((event) => nfts.some((nft) => nft.id === (event.parsedJson as TradePortBuyEvent).nft_id));
