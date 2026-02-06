@@ -17,6 +17,7 @@ WORKDIR /app
 # Copy only built output and necessary files
 COPY --from=build /app/package.json /app/bun.lockb ./
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/indexed-data ./indexed-data
 
 # Expose the port
 EXPOSE 4444
