@@ -1,6 +1,9 @@
 FROM oven/bun:1 AS build
 WORKDIR /app
 
+# Set production environment
+ENV NODE_ENV=production
+
 # Install dependencies
 COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
